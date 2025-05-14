@@ -15,6 +15,7 @@
 <script setup lang="ts">
 import BasicLayOut from './layouts/BasicLayOut.vue';
 import {useLoginUserStore} from "@/store/useLoginUserStore";
+import "./access"
 
 const loginUserStore = useLoginUserStore();
 loginUserStore.fetchLoginUser();

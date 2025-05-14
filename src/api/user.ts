@@ -50,12 +50,12 @@ export const getCurrentUser = async () => {
  * 获取用户列表
  * @param username
  */
-export const searchUsers = async (username: any) => {
+export const searchUsers = async (userName: any) => {
     return myAxios.request({
         url: "/user/search",
         method: "GET",
         params: {
-            username,
+            userName,
         },
     });
 };
@@ -67,7 +67,7 @@ export const searchUsers = async (username: any) => {
 export const deleteUser = async (id: string) => {
     return myAxios.request({
         url: "/user/delete",
-        method: "POST",
+        method: "DELETE",
         data: id,
         // 关键点：要传递 JSON 格式的值
         headers: {
