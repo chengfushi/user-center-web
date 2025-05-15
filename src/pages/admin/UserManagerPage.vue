@@ -75,16 +75,17 @@ const columns = [
     },
     {
         title: '账号',
-        dataIndex: 'userAccount',
+        dataIndex: 'loginAccount',
     },
     {
         title: '头像',
         dataIndex: 'avatarUrl',
     },
-    {
-        title: "id",
-        dataIndex: "id",
-    },
+    // 移除以下重复定义
+    // {
+    //    title: "id",
+    //    dataIndex: "id",
+    // },
     {
         title: '性别',
         dataIndex: 'gender',
