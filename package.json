@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve --port=3000",
+    "dev": "npm run serve",
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint"
   },
@@ -28,4 +29,5 @@
     "eslint-plugin-vue": "^8.0.3",
     "typescript": "~4.5.5"
   }
+
 }
