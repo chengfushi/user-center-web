@@ -2,14 +2,14 @@ import myAxios from "@/request";
 
 export const getMessageList = async () => {
     return myAxios.request({
-        url: "/message/search",
+        url: "/api/message/search",
         method: "POST",
     });
 }
 
 export const addMessage = async (messageContent:any) => {
     return myAxios.request({
-        url: "/message/add",
+        url: "/api/message/add",
         method: "POST",
         data: messageContent,
 
@@ -18,7 +18,7 @@ export const addMessage = async (messageContent:any) => {
 
 export const deleteMessage = async (id: any) => {
     return myAxios.request({
-        url: "/message/delete",
+        url: "/api/message/delete",
         method: "DELETE",
         data: id,
 

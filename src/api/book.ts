@@ -6,7 +6,7 @@ import myAxios from "@/request";
  */
 export const addBook = async (params: any) => {
     return myAxios.request({
-        url: "/book/add",
+        url: "/api/book/add",
         method: "POST",
         data: params,
     });
@@ -18,7 +18,7 @@ export const addBook = async (params: any) => {
  */
 export const searchBook = async (bookName: any) => {
     return myAxios.request({
-        url: "/book/search",
+        url: "/api/book/search",
         method: "GET",
         params: {
             bookName,
@@ -32,7 +32,7 @@ export const searchBook = async (bookName: any) => {
  */
 export const updateBook = async (params: any) => {
     return myAxios.request({
-        url: "/book/update",
+        url: "/api/book/update",
         method: "PATCH",
         data: params,
     });
@@ -44,7 +44,7 @@ export const updateBook = async (params: any) => {
  */
 export const deleteBook = async (bookIsbn: any) => {
     return myAxios.request({
-        url: "/book/delete",
+        url: "/api/book/delete",
         method: "DELETE",
         data: bookIsbn,
         // 关键点：要传递 JSON 格式的值

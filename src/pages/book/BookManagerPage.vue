@@ -1,5 +1,5 @@
 <template>
-    <div id="bookManage">
+    <div id="bookManage" style="margin-bottom: 30px">
         <div class="search">
             <a-input-search
                 style="max-width: 320px;margin-bottom: 20px"
@@ -66,6 +66,10 @@
                     <template v-if="column.dataIndex === 'action' && isAdmin">
                         <a-button @click="openEditModal(record)">编辑</a-button>
                         <a-button danger @click="doDelete(record.bookIsbn)">删除</a-button>
+                    </template>
+
+                    <template v-else-if="column.dataIndex === 'photoUrl'">
+                        <img :src="record.photoUrl" :alt="record.bookName" style="max-width: 50px; max-height: 50px;" />
                     </template>
 
                     <!-- 普通用户购买操作列 -->
@@ -137,6 +141,7 @@
         </a-modal>
 
         <!-- 普通用户购物车 -->
+        <div class="shoop" style="margin-bottom: 20px">
         <div v-if="!isAdmin && cartItems.length > 0" class="cart-container">
             <h3>购物车</h3>
             <div class="cart-items">
@@ -152,6 +157,7 @@
             <a-button type="primary" @click="checkout">结算</a-button>
         </div>
     </div>
+    </div>
 </template>
 
 <script lang="ts" setup>
@@ -164,6 +170,7 @@ import {useLoginUserStore} from "@/store/useLoginUserStore";
 
 interface FormState {
     bookIsbn: string;
+    photo_Url:string;
     bookName: string;
     bookPrice: number;
     publishDate: dayjs.Dayjs | null;
@@ -172,6 +179,7 @@ interface FormState {
 // 添加书籍表单
 const formState = reactive<FormState>({
     bookIsbn: '',
+    photo_Url: '',
     bookName: '',
     bookPrice: 0,
     publishDate: null,
@@ -180,6 +188,7 @@ const formState = reactive<FormState>({
 // 编辑书籍表单
 const editFormState = reactive<FormState>({
     bookIsbn: '',
+    photo_Url: '',
     bookName: '',
     bookPrice: 0,
     publishDate: null,
@@ -298,6 +307,10 @@ const columns = [
         dataIndex: "bookIsbn",
     },
     {
+        title: '图片',
+        dataIndex: 'photoUrl',
+    },
+    {
         title: '书名',
         dataIndex: 'bookName',
     },
@@ -320,6 +333,10 @@ const userColumns = [
     {
         title: "ISBN",
         dataIndex: "bookIsbn",
+    },
+    {
+        title: '图片',
+        dataIndex: 'photoUrl',
     },
     {
         title: '书名',

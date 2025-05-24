@@ -6,7 +6,7 @@ import myAxios from "@/request";
  */
 export const userRegister = async (params: any) => {
     return myAxios.request({
-        url: "/user/register",
+        url: "/api/user/register",
         method: "POST",
         data: params,
     });
@@ -18,7 +18,7 @@ export const userRegister = async (params: any) => {
  */
 export const userLogin = async (params: any) => {
     return myAxios.request({
-        url: "/user/login",
+        url: "/api/user/login",
         method: "POST",
         data: params,
     });
@@ -30,7 +30,7 @@ export const userLogin = async (params: any) => {
  */
 export const userLogout = async (params: any) => {
     return myAxios.request({
-        url: "/user/logout",
+        url: "/api/user/logout",
         method: "POST",
         data: params,
     });
@@ -41,7 +41,7 @@ export const userLogout = async (params: any) => {
  */
 export const getCurrentUser = async () => {
     return myAxios.request({
-        url: "/user/current",
+        url: "/api/user/current",
         method: "GET",
     });
 };
@@ -52,7 +52,7 @@ export const getCurrentUser = async () => {
  */
 export const searchUsers = async (userName: any) => {
     return myAxios.request({
-        url: "/user/search",
+        url: "/api/user/search",
         method: "GET",
         params: {
             userName,
@@ -66,7 +66,7 @@ export const searchUsers = async (userName: any) => {
  */
 export const deleteUser = async (id: string) => {
     return myAxios.request({
-        url: "/user/delete",
+        url: "/api/user/delete",
         method: "DELETE",
         data: id,
         // 关键点：要传递 JSON 格式的值

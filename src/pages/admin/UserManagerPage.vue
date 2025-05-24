@@ -65,10 +65,10 @@ const doDelete = async (id:string) => {
 }
 
 const columns = [
-    {
-        title: "id",
-        dataIndex: "id",
-    },
+    // {
+    //     title: "id",
+    //     dataIndex: "id",
+    // },
     {
         title: '用户名',
         dataIndex: 'userName',
