@@ -46,6 +46,27 @@
                 </a-form-item>
 
                 <a-form-item
+                    label="图片"
+                    name="bookImageBase64"
+                >
+                    <a-upload
+                        name="avatar"
+                        list-type="picture-card"
+                        class="avatar-uploader"
+                        :show-upload-list="false"
+                        :before-upload="beforeUpload"
+                        :customRequest="handleCustomUpload"
+                    >
+                        <img v-if="imageUrl" :src="imageUrl" alt="avatar" style="width: 100%" />
+                        <div v-else>
+                            <loading-outlined v-if="loading"></loading-outlined>
+                            <plus-outlined v-else></plus-outlined>
+                            <div class="ant-upload-text">上传</div>
+                        </div>
+                    </a-upload>
+                </a-form-item>
+
+                <a-form-item
                     label="出版日期"
                     name="publishDate"
                     :rules="[{ required: true, message: '请选择出版日期!' }]"
@@ -69,7 +90,7 @@
                     </template>
 
                     <template v-else-if="column.dataIndex === 'photoUrl'">
-                        <img :src="record.photoUrl" :alt="record.bookName" style="max-width: 50px; max-height: 50px;" />
+                        <img :src="'data:image/jpeg;base64,' + record.bookImageBase64" :alt="record.bookName" style="max-width: 50px; max-height: 50px;" />
                     </template>
 
                     <!-- 普通用户购买操作列 -->
@@ -137,31 +158,53 @@
                 >
                     <a-date-picker v-model:value="editFormState.publishDate"/>
                 </a-form-item>
+
+                <a-form-item
+                    label="图片"
+                    name="bookImageBase64"
+                >
+                    <a-upload
+                        name="avatar"
+                        list-type="picture-card"
+                        class="avatar-uploader"
+                        :show-upload-list="false"
+                        :before-upload="beforeUpload"
+                        :customRequest="handleCustomUpload"
+                    >
+                        <img v-if="imageUrl" :src="imageUrl" alt="avatar" style="width: 100%" />
+                        <div v-else>
+                            <loading-outlined v-if="loading"></loading-outlined>
+                            <plus-outlined v-else></plus-outlined>
+                            <div class="ant-upload-text">上传</div>
+                        </div>
+                    </a-upload>
+                </a-form-item>
             </a-form>
         </a-modal>
 
         <!-- 普通用户购物车 -->
         <div class="shoop" style="margin-bottom: 20px">
-        <div v-if="!isAdmin && cartItems.length > 0" class="cart-container">
-            <h3>购物车</h3>
-            <div class="cart-items">
-                <div v-for="(item, index) in cartItems" :key="index" class="cart-item">
-                    <span>{{ item.bookName }} × {{ item.quantity }}</span>
-                    <span class="cart-item-price">¥{{ item.totalPrice }}</span>
+            <div v-if="!isAdmin && cartItems.length > 0" class="cart-container">
+                <h3>购物车</h3>
+                <div class="cart-items">
+                    <div v-for="(item, index) in cartItems" :key="index" class="cart-item">
+                        <span>{{ item.bookName }} × {{ item.quantity }}</span>
+                        <span class="cart-item-price">¥{{ item.totalPrice }}</span>
+                    </div>
                 </div>
+                <div class="cart-total">
+                    <span>总计</span>
+                    <span class="cart-total-price">¥{{ cartTotalPrice }}</span>
+                </div>
+                <a-button type="primary" @click="checkout">结算</a-button>
             </div>
-            <div class="cart-total">
-                <span>总计</span>
-                <span class="cart-total-price">¥{{ cartTotalPrice }}</span>
-            </div>
-            <a-button type="primary" @click="checkout">结算</a-button>
         </div>
-    </div>
     </div>
 </template>
 
 <script lang="ts" setup>
-import {SmileOutlined, DownOutlined} from '@ant-design/icons-vue';
+import {SmileOutlined, DownOutlined, LoadingOutlined, PlusOutlined} from '@ant-design/icons-vue';
+import { ref as vRef } from 'vue';
 import {addBook, searchBook, updateBook, deleteBook} from "@/api/book";
 import {reactive, ref, onMounted, computed} from "vue";
 import {message} from "ant-design-vue";
@@ -170,29 +213,87 @@ import {useLoginUserStore} from "@/store/useLoginUserStore";
 
 interface FormState {
     bookIsbn: string;
-    photo_Url:string;
     bookName: string;
     bookPrice: number;
     publishDate: dayjs.Dayjs | null;
+    bookImageBase64: string;
 }
 
 // 添加书籍表单
 const formState = reactive<FormState>({
     bookIsbn: '',
-    photo_Url: '',
     bookName: '',
     bookPrice: 0,
     publishDate: null,
+    bookImageBase64: ''
 });
 
 // 编辑书籍表单
 const editFormState = reactive<FormState>({
     bookIsbn: '',
-    photo_Url: '',
     bookName: '',
     bookPrice: 0,
     publishDate: null,
+    bookImageBase64: ''
 });
+
+// 图片上传相关
+const imageUrl = vRef<string>('');
+const loading = vRef<boolean>(false);
+
+/**
+ * 处理图片上传前的操作
+ * @param file 待上传的文件
+ * @returns 是否允许上传
+ */
+const beforeUpload = (file: File) => {
+    const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png';
+    if (!isJpgOrPng) {
+        message.error('只能上传JPG/PNG格式的图片！');
+    }
+    const isLt2M = file.size / 1024 / 1024 < 2;
+    if (!isLt2M) {
+        message.error('图片大小不能超过2MB！');
+    }
+    return isJpgOrPng && isLt2M;
+};
+
+/**
+ * 自定义上传处理函数，直接在本地处理文件转base64
+ * @param options 上传选项
+ */
+const handleCustomUpload = (options: any) => {
+    const { file, onSuccess, onError } = options;
+    try {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = (e) => {
+            if (e.target) {
+                const base64String = e.target.result as string;
+                // 移除base64字符串中的前缀部分
+                const base64Data = base64String.split(',')[1];
+                // 更新表单数据
+                if (editModalVisible.value) {
+                    editFormState.bookImageBase64 = base64Data;
+                } else {
+                    formState.bookImageBase64 = base64Data;
+                }
+                imageUrl.value = base64String; // 保留完整base64用于显示
+                loading.value = false;
+                onSuccess();
+            }
+        };
+        reader.onerror = (error) => {
+            loading.value = false;
+            message.error('图片读取失败');
+            onError(error);
+        };
+    } catch (error) {
+        loading.value = false;
+        message.error('图片处理失败');
+        onError(error);
+    }
+};
 
 const editModalVisible = ref(false);
 
@@ -264,6 +365,9 @@ const openEditModal = (record: any) => {
     editFormState.bookName = record.bookName;
     editFormState.bookPrice = record.bookPrice;
     editFormState.publishDate = record.publishDate;
+    editFormState.bookImageBase64 = record.bookImageBase64;
+    // 编辑模式下不显示已有图片
+    imageUrl.value = '';
 
     editModalVisible.value = true;
 }
@@ -409,6 +513,8 @@ const purchaseBook = (record: any) => {
         });
     }
     message.success(`已将《${record.bookName}》${record.purchaseQuantity}本加入购物车`);
+    // 刷新数据
+    fetchData();
 };
 
 // 计算购物车总价
@@ -426,14 +532,29 @@ const checkout = () => {
     message.success(`结算成功，共支付 ¥${cartTotalPrice.value}`);
     // 清空购物车
     cartItems.value = [];
+    // 刷新数据
+    fetchData();
 };
 
 // 初始化加载数据
 fetchData();
-
 </script>
 
 <style scoped>
+/* 添加上传组件样式 */
+.avatar-uploader > .ant-upload {
+    width: 128px;
+    height: 128px;
+}
+.ant-upload-select-picture-card i {
+    font-size: 32px;
+    color: #999;
+}
+.ant-upload-select-picture-card .ant-upload-text {
+    margin-top: 8px;
+    color: #666;
+}
+
 .purchase-controls {
     display: flex;
     flex-direction: row; /* 改为行布局实现横向排列 */
